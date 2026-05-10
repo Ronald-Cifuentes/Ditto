@@ -9,7 +9,10 @@ enum PasteboardBridge {
     static func readPayload() -> ClipboardPayload? {
         let pasteboard = NSPasteboard.general
 
-        if let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL],
+        if let urls = pasteboard.readObjects(
+            forClasses: [NSURL.self],
+            options: [.urlReadingFileURLsOnly: true]
+        ) as? [URL],
            !urls.isEmpty {
             let paths = urls.map(\.path).joined(separator: "\n")
             return ClipboardPayload(
@@ -60,36 +63,15 @@ enum PasteboardBridge {
 
         switch payload.kind {
         case .text:
-            guard pasteboard.setString(payload.content, forType: .string) else {
-                throw pasteboardError("failed to write text to pasteboard")
-            }
+            try writeTextPayload(payload, to: pasteboard)
         case .image:
-            guard let data = payload.payload else {
-                throw pasteboardError("image payload is missing")
-            }
-            pasteboard.setData(data, forType: .tiff)
-            guard NSImage(data: data) != nil else {
-                throw pasteboardError("image payload is not readable")
-            }
+            try writeImagePayload(payload, to: pasteboard)
         case .files:
-            let urls = payload.content
-                .split(separator: "\n", omittingEmptySubsequences: true)
-                .map { NSURL(fileURLWithPath: String($0)) }
-            guard !urls.isEmpty, pasteboard.writeObjects(urls) else {
-                throw pasteboardError("failed to write file URLs to pasteboard")
-            }
+            try writeFilePayload(payload, to: pasteboard)
         case .rtf:
-            guard let data = payload.payload else {
-                throw pasteboardError("RTF payload is missing")
-            }
-            pasteboard.setData(data, forType: .rtf)
-            pasteboard.setString(payload.content, forType: .string)
+            try writeDataPayload(payload, type: .rtf, missingMessage: "RTF payload is missing")
         case .html:
-            guard let data = payload.payload else {
-                throw pasteboardError("HTML payload is missing")
-            }
-            pasteboard.setData(data, forType: .html)
-            pasteboard.setString(payload.content, forType: .string)
+            try writeDataPayload(payload, type: .html, missingMessage: "HTML payload is missing")
         }
     }
 
@@ -108,7 +90,58 @@ enum PasteboardBridge {
         return attributed.string
     }
 
+    private static func writeTextPayload(
+        _ payload: ClipboardPayload,
+        to pasteboard: NSPasteboard
+    ) throws {
+        guard pasteboard.setString(payload.content, forType: .string) else {
+            throw pasteboardError("failed to write text to pasteboard")
+        }
+    }
+
+    private static func writeImagePayload(
+        _ payload: ClipboardPayload,
+        to pasteboard: NSPasteboard
+    ) throws {
+        guard let data = payload.payload else {
+            throw pasteboardError("image payload is missing")
+        }
+        pasteboard.setData(data, forType: .tiff)
+        guard NSImage(data: data) != nil else {
+            throw pasteboardError("image payload is not readable")
+        }
+    }
+
+    private static func writeFilePayload(
+        _ payload: ClipboardPayload,
+        to pasteboard: NSPasteboard
+    ) throws {
+        let urls = payload.content
+            .split(separator: "\n", omittingEmptySubsequences: true)
+            .map { NSURL(fileURLWithPath: String($0)) }
+        guard !urls.isEmpty, pasteboard.writeObjects(urls) else {
+            throw pasteboardError("failed to write file URLs to pasteboard")
+        }
+    }
+
+    private static func writeDataPayload(
+        _ payload: ClipboardPayload,
+        type: NSPasteboard.PasteboardType,
+        missingMessage: String
+    ) throws {
+        guard let data = payload.payload else {
+            throw pasteboardError(missingMessage)
+        }
+        let pasteboard = NSPasteboard.general
+        pasteboard.setData(data, forType: type)
+        pasteboard.setString(payload.content, forType: .string)
+    }
+
     private static func pasteboardError(_ message: String) -> NSError {
-        NSError(domain: "DittoMac.Pasteboard", code: 1, userInfo: [NSLocalizedDescriptionKey: message])
+        NSError(
+            domain: "DittoMac.Pasteboard",
+            code: 1,
+            userInfo: [NSLocalizedDescriptionKey: message]
+        )
     }
 }

@@ -54,30 +54,46 @@ final class ShortcutSettingsStore: ObservableObject {
     }
 
     static let defaultAssignments: [ShortcutAssignment] = [
-        .init(commandID: "show_ditto", commandName: "Show Quick Paste", primary: "Command-Option-V", secondary: "", scope: "Global"),
-        .init(commandID: "capture_now", commandName: "Save Current Clipboard", primary: "Command-Shift-C", secondary: "", scope: "App"),
-        .init(commandID: "paste_selected", commandName: "Paste Selected", primary: "Command-Return", secondary: "", scope: "App"),
-        .init(commandID: "copy_latest", commandName: "Copy Latest", primary: "Command-Shift-V", secondary: "", scope: "App"),
-        .init(commandID: "delete_selected", commandName: "Delete Selected", primary: "Delete", secondary: "", scope: "App"),
-        .init(commandID: "refresh_list", commandName: "Refresh List", primary: "Command-R", secondary: "", scope: "App"),
-        .init(commandID: "new_group", commandName: "New Group", primary: "F7", secondary: "", scope: "Quick Paste"),
-        .init(commandID: "new_group_selection", commandName: "New Group Selection", primary: "Control-F7", secondary: "", scope: "Quick Paste"),
-        .init(commandID: "back_group", commandName: "Back Group", primary: "Backspace", secondary: "", scope: "Quick Paste"),
-        .init(commandID: "plain_text", commandName: "Paste Selected Plain Text", primary: "", secondary: "", scope: "Quick Paste"),
-        .init(commandID: "upper_case", commandName: "Paste Upper Case", primary: "", secondary: "", scope: "Special Paste"),
-        .init(commandID: "lower_case", commandName: "Paste Lower Case", primary: "", secondary: "", scope: "Special Paste"),
-        .init(commandID: "sentence_case", commandName: "Paste Sentence Case", primary: "", secondary: "", scope: "Special Paste"),
-        .init(commandID: "trim_whitespace", commandName: "Paste Trim White Space", primary: "", secondary: "", scope: "Special Paste"),
-        .init(commandID: "slugify", commandName: "Slugify", primary: "", secondary: "", scope: "Special Paste"),
-        .init(commandID: "position_1", commandName: "Paste Position 1", primary: "Command-1", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_2", commandName: "Paste Position 2", primary: "Command-2", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_3", commandName: "Paste Position 3", primary: "Command-3", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_4", commandName: "Paste Position 4", primary: "Command-4", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_5", commandName: "Paste Position 5", primary: "Command-5", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_6", commandName: "Paste Position 6", primary: "Command-6", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_7", commandName: "Paste Position 7", primary: "Command-7", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_8", commandName: "Paste Position 8", primary: "Command-8", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_9", commandName: "Paste Position 9", primary: "Command-9", secondary: "", scope: "First Ten"),
-        .init(commandID: "position_10", commandName: "Paste Position 10", primary: "Command-0", secondary: "", scope: "First Ten")
+        assignment("show_ditto", "Show Quick Paste", "Command-Option-V", scope: "Global"),
+        assignment("capture_now", "Save Current Clipboard", "Command-Shift-C", scope: "App"),
+        assignment("paste_selected", "Paste Selected", "Command-Return", scope: "App"),
+        assignment("copy_latest", "Copy Latest", "Command-Shift-V", scope: "App"),
+        assignment("delete_selected", "Delete Selected", "Delete", scope: "App"),
+        assignment("refresh_list", "Refresh List", "Command-R", scope: "App"),
+        assignment("new_group", "New Group", "F7", scope: "Quick Paste"),
+        assignment("new_group_selection", "New Group Selection", "Control-F7", scope: "Quick Paste"),
+        assignment("back_group", "Back Group", "Backspace", scope: "Quick Paste"),
+        assignment("plain_text", "Paste Selected Plain Text", scope: "Quick Paste"),
+        assignment("upper_case", "Paste Upper Case", scope: "Special Paste"),
+        assignment("lower_case", "Paste Lower Case", scope: "Special Paste"),
+        assignment("sentence_case", "Paste Sentence Case", scope: "Special Paste"),
+        assignment("trim_whitespace", "Paste Trim White Space", scope: "Special Paste"),
+        assignment("slugify", "Slugify", scope: "Special Paste"),
+        assignment("position_1", "Paste Position 1", "Command-1", scope: "First Ten"),
+        assignment("position_2", "Paste Position 2", "Command-2", scope: "First Ten"),
+        assignment("position_3", "Paste Position 3", "Command-3", scope: "First Ten"),
+        assignment("position_4", "Paste Position 4", "Command-4", scope: "First Ten"),
+        assignment("position_5", "Paste Position 5", "Command-5", scope: "First Ten"),
+        assignment("position_6", "Paste Position 6", "Command-6", scope: "First Ten"),
+        assignment("position_7", "Paste Position 7", "Command-7", scope: "First Ten"),
+        assignment("position_8", "Paste Position 8", "Command-8", scope: "First Ten"),
+        assignment("position_9", "Paste Position 9", "Command-9", scope: "First Ten"),
+        assignment("position_10", "Paste Position 10", "Command-0", scope: "First Ten")
     ]
+
+    private static func assignment(
+        _ commandID: String,
+        _ commandName: String,
+        _ primary: String = "",
+        secondary: String = "",
+        scope: String
+    ) -> ShortcutAssignment {
+        ShortcutAssignment(
+            commandID: commandID,
+            commandName: commandName,
+            primary: primary,
+            secondary: secondary,
+            scope: scope
+        )
+    }
 }

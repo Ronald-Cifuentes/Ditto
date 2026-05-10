@@ -18,13 +18,19 @@ APP_RESOURCES := $(APP_CONTENTS)/Resources
 APP_BIN := $(APP_MACOS)/$(APP_NAME)
 APP_SMOKE_BIN := $(BUILD_DIR)/ditto-mac-app-smoke
 SWIFT_CORE_SOURCES := \
+	app/ClipboardTypes.swift \
+	app/SQLiteStatement.swift \
 	app/SQLiteHistoryStore.swift \
+	app/SQLiteHistoryStore+Schema.swift \
+	app/SQLiteHistoryStore+Binding.swift \
 	app/PasteboardBridge.swift
 SWIFT_APP_SOURCES := \
 	app/ClipboardHistoryModel.swift \
 	app/GlobalHotKeyController.swift \
 	app/PasteExecutor.swift \
 	app/ShortcutSettings.swift \
+	app/SettingsSection.swift \
+	app/ShortcutAssignmentRow.swift \
 	app/MainWindowAccessor.swift \
 	app/AppDelegate.swift \
 	app/ContentView.swift \

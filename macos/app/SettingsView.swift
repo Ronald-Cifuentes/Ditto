@@ -15,8 +15,10 @@ struct SettingsView: View {
         }
         .frame(minWidth: 460, idealWidth: 820, minHeight: 430, idealHeight: 600)
     }
+}
 
-    private var tabbedSettings: some View {
+private extension SettingsView {
+    var tabbedSettings: some View {
         TabView {
             generalTab
                 .tabItem { Label("General", systemImage: "gearshape") }
@@ -40,7 +42,7 @@ struct SettingsView: View {
         .padding(20)
     }
 
-    private var compactSettings: some View {
+    var compactSettings: some View {
         VStack(spacing: 12) {
             Picker("Settings", selection: $selectedSection) {
                 ForEach(SettingsSection.allCases) { section in
@@ -62,7 +64,7 @@ struct SettingsView: View {
     }
 
     @ViewBuilder
-    private var selectedSectionView: some View {
+    var selectedSectionView: some View {
         switch selectedSection {
         case .general:
             generalTab
@@ -84,8 +86,10 @@ struct SettingsView: View {
             aboutTab
         }
     }
+}
 
-    private var generalTab: some View {
+private extension SettingsView {
+    var generalTab: some View {
         Form {
             Toggle("Monitor Clipboard", isOn: $model.isMonitoring)
             Toggle("Global Hotkey: Command-Option-V", isOn: $model.isGlobalHotKeyEnabled)
@@ -93,7 +97,10 @@ struct SettingsView: View {
             Section("Appearance") {
                 LabeledContent("Theme", value: "System")
                 LabeledContent("Popup position", value: "Previous window / active display")
-                Text("Windows theme engine, caption docking, roll-up, transparency, and custom non-client painting are not ported yet.")
+                Text(
+                    "Windows theme engine, caption docking, roll-up, transparency, " +
+                        "and custom non-client painting are not ported yet."
+                )
                     .foregroundStyle(.secondary)
             }
 
@@ -108,7 +115,7 @@ struct SettingsView: View {
         }
     }
 
-    private var shortcutsTab: some View {
+    var shortcutsTab: some View {
         VStack(alignment: .leading, spacing: 12) {
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top) {
@@ -125,26 +132,32 @@ struct SettingsView: View {
             List {
                 ForEach($shortcuts.assignments) { $assignment in
                     ShortcutAssignmentRow(assignment: $assignment)
-                    .padding(.vertical, 4)
+                        .padding(.vertical, 4)
                 }
             }
             .frame(minHeight: 260)
         }
     }
 
-    private var shortcutIntro: some View {
+    var shortcutIntro: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Shortcut Creation")
                 .font(.title3)
                 .fontWeight(.semibold)
-            Text("This mirrors the Windows Quick Paste Keyboard page structurally. Assignments are persisted; only the app-level commands and Command-Option-V global hotkey are currently wired.")
+            Text(
+                "This mirrors the Windows Quick Paste Keyboard page structurally. " +
+                    "Assignments are persisted; only the app-level commands and " +
+                    "Command-Option-V global hotkey are currently wired."
+            )
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
+}
 
-    private var quickPasteTab: some View {
+private extension SettingsView {
+    var quickPasteTab: some View {
         Form {
             Section("Window") {
                 LabeledContent("Search", value: "Description/content/kind/group")
@@ -163,7 +176,7 @@ struct SettingsView: View {
         }
     }
 
-    private var supportedTypesTab: some View {
+    var supportedTypesTab: some View {
         Form {
             Section("Implemented Types") {
                 LabeledContent("Text", value: "Stored/restored")
@@ -175,13 +188,16 @@ struct SettingsView: View {
 
             Section("Missing Windows Type Configuration") {
                 missing("Add/remove arbitrary clipboard format names like the Windows Types table")
-                missing("Windows-specific CF_DIB, CF_HDROP internals, registered format names, and delayed OLE rendering")
+                missing(
+                    "Windows-specific CF_DIB, CF_HDROP internals, registered format " +
+                        "names, and delayed OLE rendering"
+                )
                 missing("Per-type capture enable/disable persistence")
             }
         }
     }
 
-    private var copyBuffersTab: some View {
+    var copyBuffersTab: some View {
         Form {
             Section("Windows Copy Buffers") {
                 missing("Three named copy/cut/paste buffers")
@@ -192,7 +208,7 @@ struct SettingsView: View {
         }
     }
 
-    private var friendsTab: some View {
+    var friendsTab: some View {
         Form {
             Section("Network Friends") {
                 missing("Friend list configuration")
@@ -203,7 +219,7 @@ struct SettingsView: View {
         }
     }
 
-    private var maintenanceTab: some View {
+    var maintenanceTab: some View {
         Form {
             Section("Storage") {
                 Text(model.databasePath)
@@ -225,26 +241,48 @@ struct SettingsView: View {
             }
         }
     }
+}
 
-    private var parityTab: some View {
+private extension SettingsView {
+    var parityTab: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Windows Menus Still Missing Or Partial")
                     .font(.title3)
                     .fontWeight(.semibold)
-                parity("Tray/system menu", "Startup message, connect/disconnect clipboard, backup/restore, import, new clip, delete unused clips.")
-                parity("Quick Paste context menu", "Send To, Special Paste transforms, Compare, Quick Properties, Clip Order, Import/Export, Email/Gmail, QR.")
+                parity(
+                    "Tray/system menu",
+                    "Startup message, connect/disconnect clipboard, backup/restore, " +
+                        "import, new clip, delete unused clips."
+                )
+                parity(
+                    "Quick Paste context menu",
+                    "Send To, Special Paste transforms, Compare, Quick Properties, " +
+                        "Clip Order, Import/Export, Email/Gmail, QR."
+                )
                 parity("Search menu", "Search mode toggles exist only as simple text search on Mac.")
-                parity("Description options menu", "Text/RTF/HTML/image view mode, always-on-top, wrapping, scaling, remember position.")
+                parity(
+                    "Description options menu",
+                    "Text/RTF/HTML/image view mode, always-on-top, wrapping, " +
+                        "scaling, remember position."
+                )
                 parity("Group menu", "New subgroup, delete group, properties; Mac currently has flat groups.")
-                parity("Options pages", "General, Supported Types, Keyboard Shortcuts, Copy Buffers, Quick Paste Keyboard, Friends, Stats, About, Advanced.")
-                parity("Dialogs", "Add Type, Copy Properties, Group Properties, Move To Group, Remote File, Global Clips, Delete Clip Data, Script Editor.")
+                parity(
+                    "Options pages",
+                    "General, Supported Types, Keyboard Shortcuts, Copy Buffers, " +
+                        "Quick Paste Keyboard, Friends, Stats, About, Advanced."
+                )
+                parity(
+                    "Dialogs",
+                    "Add Type, Copy Properties, Group Properties, Move To Group, " +
+                        "Remote File, Global Clips, Delete Clip Data, Script Editor."
+                )
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
-    private var aboutTab: some View {
+    var aboutTab: some View {
         Form {
             Section("Ditto macOS") {
                 LabeledContent("Version", value: "0.1.0")
@@ -253,124 +291,26 @@ struct SettingsView: View {
             }
 
             Section("Source Parity") {
-                Text("The Windows codebase remains the source of truth for feature parity. See macos/PARITY.md for the strict backlog.")
+                Text(
+                    "The Windows codebase remains the source of truth for feature " +
+                        "parity. See macos/PARITY.md for the strict backlog."
+                )
                     .foregroundStyle(.secondary)
             }
         }
     }
 
-    private func missing(_ text: String) -> some View {
+    func missing(_ text: String) -> some View {
         Label(text, systemImage: "exclamationmark.triangle")
             .foregroundStyle(.secondary)
     }
 
-    private func parity(_ title: String, _ detail: String) -> some View {
+    func parity(_ title: String, _ detail: String) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(title)
                 .fontWeight(.semibold)
             Text(detail)
                 .foregroundStyle(.secondary)
-        }
-    }
-}
-
-private enum SettingsSection: String, CaseIterable, Identifiable {
-    case general
-    case shortcuts
-    case quickPaste
-    case types
-    case copyBuffers
-    case friends
-    case database
-    case parity
-    case about
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .general:
-            return "General"
-        case .shortcuts:
-            return "Shortcuts"
-        case .quickPaste:
-            return "Quick Paste"
-        case .types:
-            return "Types"
-        case .copyBuffers:
-            return "Copy Buffers"
-        case .friends:
-            return "Friends"
-        case .database:
-            return "Database"
-        case .parity:
-            return "Parity"
-        case .about:
-            return "About"
-        }
-    }
-
-    var symbolName: String {
-        switch self {
-        case .general:
-            return "gearshape"
-        case .shortcuts:
-            return "keyboard"
-        case .quickPaste:
-            return "list.bullet.rectangle"
-        case .types:
-            return "doc.on.clipboard"
-        case .copyBuffers:
-            return "tray.2"
-        case .friends:
-            return "network"
-        case .database:
-            return "externaldrive"
-        case .parity:
-            return "checklist"
-        case .about:
-            return "info.circle"
-        }
-    }
-}
-
-private struct ShortcutAssignmentRow: View {
-    @Binding var assignment: ShortcutAssignment
-
-    var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 10) {
-                title
-                Spacer(minLength: 8)
-                shortcutFields
-                    .frame(maxWidth: 320)
-            }
-            VStack(alignment: .leading, spacing: 8) {
-                title
-                shortcutFields
-            }
-        }
-    }
-
-    private var title: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(assignment.commandName)
-                .fontWeight(.medium)
-                .lineLimit(2)
-            Text(assignment.scope)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    private var shortcutFields: some View {
-        HStack(spacing: 8) {
-            TextField("Primary", text: $assignment.primary)
-                .textFieldStyle(.roundedBorder)
-                .frame(minWidth: 90, maxWidth: 150)
-            TextField("Secondary", text: $assignment.secondary)
-                .textFieldStyle(.roundedBorder)
-                .frame(minWidth: 90, maxWidth: 150)
         }
     }
 }

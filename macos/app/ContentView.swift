@@ -16,9 +16,11 @@ struct ContentView: View {
         }
         .frame(minWidth: 520, minHeight: 430)
     }
+}
 
+private extension ContentView {
     @ViewBuilder
-    private func contentLayout(width: CGFloat) -> some View {
+    func contentLayout(width: CGFloat) -> some View {
         if width >= 980 {
             HStack(spacing: 0) {
                 groupSidebar
@@ -57,7 +59,7 @@ struct ContentView: View {
         }
     }
 
-    private var toolbar: some View {
+    var toolbar: some View {
         HStack(spacing: 8) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -73,7 +75,10 @@ struct ContentView: View {
                     }
                     .disabled(model.selectedClip == nil)
                     Button(action: model.toggleFavoriteSelected) {
-                        Label("Favorite", systemImage: model.selectedClip?.isFavorite == true ? "star.fill" : "star")
+                        Label(
+                            "Favorite",
+                            systemImage: model.selectedClip?.isFavorite == true ? "star.fill" : "star"
+                        )
                     }
                     .disabled(model.selectedClip == nil)
                     Button(action: model.deleteSelected) {
@@ -84,9 +89,12 @@ struct ContentView: View {
                         Label("Clear", systemImage: "xmark.circle")
                     }
                     .disabled(model.clips.isEmpty)
-                    Button(action: { model.refresh(status: "Refreshed") }) {
-                        Label("Refresh", systemImage: "arrow.clockwise")
-                    }
+                    Button(
+                        action: { model.refresh(status: "Refreshed") },
+                        label: {
+                            Label("Refresh", systemImage: "arrow.clockwise")
+                        }
+                    )
                 }
             }
 
@@ -101,8 +109,10 @@ struct ContentView: View {
         .buttonStyle(.bordered)
         .padding(12)
     }
+}
 
-    private var groupSidebar: some View {
+private extension ContentView {
+    var groupSidebar: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Groups")
                 .font(.headline)
@@ -118,7 +128,7 @@ struct ContentView: View {
         }
     }
 
-    private var groupPicker: some View {
+    var groupPicker: some View {
         Picker("Group", selection: $model.selectedGroup) {
             ForEach(model.groups, id: \.self) { group in
                 Label(group, systemImage: groupIcon(group))
@@ -129,7 +139,7 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var historyList: some View {
+    var historyList: some View {
         VStack(spacing: 8) {
             TextField("Search clips", text: $model.searchText)
                 .textFieldStyle(.roundedBorder)
@@ -155,8 +165,10 @@ struct ContentView: View {
             .padding([.horizontal, .bottom], 12)
         }
     }
+}
 
-    private var detailPane: some View {
+private extension ContentView {
+    var detailPane: some View {
         Group {
             if let clip = model.selectedClip {
                 VStack(alignment: .leading, spacing: 12) {
@@ -189,7 +201,7 @@ struct ContentView: View {
         }
     }
 
-    private func clipTitle(_ clip: ClipItem) -> some View {
+    func clipTitle(_ clip: ClipItem) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 8) {
                 Image(systemName: clip.kind.symbolName)
@@ -220,7 +232,7 @@ struct ContentView: View {
         }
     }
 
-    private var detailButtons: some View {
+    var detailButtons: some View {
         HStack(spacing: 8) {
             Button(action: model.pasteSelected) {
                 Label("Paste", systemImage: "command")
@@ -236,7 +248,7 @@ struct ContentView: View {
         .fixedSize()
     }
 
-    private var footer: some View {
+    var footer: some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 10) {
                 Text("\(model.filteredClips.count) shown")
@@ -270,7 +282,7 @@ struct ContentView: View {
         .padding(.vertical, 7)
     }
 
-    private func groupIcon(_ group: String) -> String {
+    func groupIcon(_ group: String) -> String {
         switch group {
         case "All":
             return "tray.full"
@@ -317,7 +329,9 @@ private struct ClipDetailBody: View {
 
     var body: some View {
         Group {
-            if clip.kind == .image, let payload = clip.payload, let image = NSImage(data: payload) {
+            if clip.kind == .image,
+               let payload = clip.payload,
+               let image = NSImage(data: payload) {
                 VStack(alignment: .leading, spacing: 10) {
                     Image(nsImage: image)
                         .resizable()

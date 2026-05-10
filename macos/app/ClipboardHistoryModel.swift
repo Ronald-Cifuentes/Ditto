@@ -26,7 +26,9 @@ final class ClipboardHistoryModel: ObservableObject {
             configureTimer()
         }
     }
-    @Published var isGlobalHotKeyEnabled = UserDefaults.standard.object(forKey: "DittoMacGlobalHotKeyEnabled") as? Bool ?? true {
+    @Published var isGlobalHotKeyEnabled = UserDefaults.standard.object(
+        forKey: "DittoMacGlobalHotKeyEnabled"
+    ) as? Bool ?? true {
         didSet {
             UserDefaults.standard.set(isGlobalHotKeyEnabled, forKey: "DittoMacGlobalHotKeyEnabled")
             configureHotKey()
@@ -49,7 +51,9 @@ final class ClipboardHistoryModel: ObservableObject {
             statusText = error.localizedDescription
         }
     }
+}
 
+extension ClipboardHistoryModel {
     var selectedClip: ClipItem? {
         guard let selectedID else {
             return filteredClips.first
@@ -92,7 +96,10 @@ final class ClipboardHistoryModel: ObservableObject {
 
         do {
             let inserted = try store.addRecord(payload)
-            refresh(status: inserted ? "Captured \(payload.kind.label.lowercased()) from pasteboard" : "Pasteboard already captured")
+            let status = inserted
+                ? "Captured \(payload.kind.label.lowercased()) from pasteboard"
+                : "Pasteboard already captured"
+            refresh(status: status)
         } catch {
             statusText = error.localizedDescription
         }
@@ -115,20 +122,6 @@ final class ClipboardHistoryModel: ObservableObject {
         } catch {
             statusText = error.localizedDescription
         }
-    }
-
-    private func copySelectedToPasteboard() throws {
-        guard let selectedClip else {
-            throw NSError(domain: "DittoMac.Selection", code: 1, userInfo: [NSLocalizedDescriptionKey: "No clip selected"])
-        }
-
-        try PasteboardBridge.writePayload(ClipboardPayload(
-            kind: selectedClip.kind,
-            content: selectedClip.content,
-            payload: selectedClip.payload,
-            metadata: selectedClip.metadata
-        ))
-        statusText = "Copied clip \(selectedClip.id)"
     }
 
     func copyLatest() {
@@ -191,7 +184,8 @@ final class ClipboardHistoryModel: ObservableObject {
 
         do {
             try store.moveClip(id: selectedID, toGroup: groupName)
-            selectedGroup = groupName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "History" : groupName
+            let trimmedName = groupName.trimmingCharacters(in: .whitespacesAndNewlines)
+            selectedGroup = trimmedName.isEmpty ? "History" : groupName
             refresh(status: "Moved clip to \(selectedGroup)")
         } catch {
             statusText = error.localizedDescription
@@ -233,8 +227,28 @@ final class ClipboardHistoryModel: ObservableObject {
     func refreshHotKeyRegistration() {
         configureHotKey()
     }
+}
 
-    private func applyFilter() {
+private extension ClipboardHistoryModel {
+    func copySelectedToPasteboard() throws {
+        guard let selectedClip else {
+            throw NSError(
+                domain: "DittoMac.Selection",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "No clip selected"]
+            )
+        }
+
+        try PasteboardBridge.writePayload(ClipboardPayload(
+            kind: selectedClip.kind,
+            content: selectedClip.content,
+            payload: selectedClip.payload,
+            metadata: selectedClip.metadata
+        ))
+        statusText = "Copied clip \(selectedClip.id)"
+    }
+
+    func applyFilter() {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         var scoped = clips
         if selectedGroup == "Favorites" {
@@ -256,12 +270,13 @@ final class ClipboardHistoryModel: ObservableObject {
             }
         }
 
-        if let selectedID, !filteredClips.contains(where: { $0.id == selectedID }) {
+        if let selectedID,
+           !filteredClips.contains(where: { $0.id == selectedID }) {
             self.selectedID = filteredClips.first?.id
         }
     }
 
-    private func configureTimer() {
+    func configureTimer() {
         timer?.invalidate()
         timer = nil
 
@@ -279,7 +294,7 @@ final class ClipboardHistoryModel: ObservableObject {
         statusText = "Monitoring pasteboard"
     }
 
-    private func pollPasteboard() {
+    func pollPasteboard() {
         let currentChangeCount = PasteboardBridge.changeCount
         guard currentChangeCount != lastPasteboardChangeCount else {
             return
@@ -289,7 +304,7 @@ final class ClipboardHistoryModel: ObservableObject {
         captureNow()
     }
 
-    private func configureHotKey() {
+    func configureHotKey() {
         do {
             if isGlobalHotKeyEnabled {
                 try GlobalHotKeyController.shared.register()
