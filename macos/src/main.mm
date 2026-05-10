@@ -80,24 +80,20 @@ std::optional<ditto::mac::Clip> resolve_clip(ditto::mac::HistoryStore& store, co
 	return store.get_by_id(parse_id(selector));
 }
 
-bool capture_once(ditto::mac::HistoryStore& store, bool quiet)
+bool capture_once(ditto::mac::HistoryStore& store)
 {
 	std::optional<std::string> value = ditto::mac::read_text_from_pasteboard();
 	if (!value.has_value() || value->empty()) {
-		if (!quiet) {
-			std::cout << "no text captured\n";
-		}
+		std::cout << "no text captured\n";
 		return false;
 	}
 
 	long long id = 0;
 	const bool inserted = store.add_clip(*value, &id);
-	if (!quiet) {
-		if (inserted) {
-			std::cout << "captured\t" << id << "\n";
-		} else {
-			std::cout << "unchanged\n";
-		}
+	if (inserted) {
+		std::cout << "captured\t" << id << "\n";
+	} else {
+		std::cout << "unchanged\n";
 	}
 	return inserted;
 }
@@ -138,7 +134,7 @@ int run(int argc, char* argv[])
 	ditto::mac::HistoryStore store(ditto::mac::configured_database_path());
 
 	if (command == "capture") {
-		capture_once(store, false);
+		capture_once(store);
 		return 0;
 	}
 	if (command == "listen") {
@@ -159,18 +155,18 @@ int run(int argc, char* argv[])
 		}
 
 		if (once) {
-			capture_once(store, false);
+			capture_once(store);
 			return 0;
 		}
 
 		long last_change_count = ditto::mac::pasteboard_change_count();
-		capture_once(store, false);
+		capture_once(store);
 		for (;;) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(interval_ms));
 			const long current_change_count = ditto::mac::pasteboard_change_count();
 			if (current_change_count != last_change_count) {
 				last_change_count = current_change_count;
-				capture_once(store, false);
+				capture_once(store);
 			}
 		}
 	}

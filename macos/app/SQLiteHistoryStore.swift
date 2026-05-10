@@ -1,7 +1,7 @@
 import Foundation
 import SQLite3
 
-enum ClipKind: String, CaseIterable {
+enum ClipKind: String {
     case text
     case image
     case files
@@ -469,15 +469,6 @@ final class SQLiteHistoryStore {
         return NSError(domain: "DittoMac.SQLite", code: 4, userInfo: [NSLocalizedDescriptionKey: "\(action): \(message)"])
     }
 
-    private func hashText(_ text: String) -> String {
-        var hash: UInt64 = 14_695_981_039_346_656_037
-        for byte in text.utf8 {
-            hash ^= UInt64(byte)
-            hash = hash &* 1_099_511_628_211
-        }
-        return String(format: "%016llx", hash)
-    }
-
     private func hashRecord(_ record: ClipboardPayload) -> String {
         var bytes = Array(record.kind.rawValue.utf8)
         bytes.append(0)
@@ -508,10 +499,8 @@ final class SQLiteHistoryStore {
 
 private final class Statement {
     let pointer: OpaquePointer?
-    private let database: OpaquePointer?
 
     init(database: OpaquePointer?, sql: String) throws {
-        self.database = database
         var statement: OpaquePointer?
         guard sqlite3_prepare_v2(database, sql, -1, &statement, nil) == SQLITE_OK else {
             let message = database.flatMap { sqlite3_errmsg($0) }.map { String(cString: $0) } ?? "unknown sqlite error"

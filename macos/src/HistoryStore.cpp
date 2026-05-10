@@ -92,11 +92,6 @@ HistoryStore::~HistoryStore()
 	}
 }
 
-const std::string& HistoryStore::path() const
-{
-	return db_path_;
-}
-
 void HistoryStore::open()
 {
 	std::filesystem::path path(db_path_);

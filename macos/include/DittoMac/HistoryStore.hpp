@@ -26,7 +26,6 @@ public:
 	HistoryStore(HistoryStore&&) = delete;
 	HistoryStore& operator=(HistoryStore&&) = delete;
 
-	const std::string& path() const;
 	bool add_clip(const std::string& content, long long* inserted_id = nullptr);
 	std::vector<Clip> list(int limit) const;
 	std::optional<Clip> get_by_id(long long id) const;
